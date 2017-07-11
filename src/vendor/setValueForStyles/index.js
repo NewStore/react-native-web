@@ -95,7 +95,7 @@ if (process.env.NODE_ENV !== 'production') {
 
   var checkRenderMessage = function(owner) {
     if (owner) {
-      var name = owner.getName();
+      var name = getComponentName(owner);
       if (name) {
         return ' Check the render method of `' + name + '`.';
       }
@@ -111,7 +111,7 @@ if (process.env.NODE_ENV !== 'production') {
   var warnValidStyle = function(name, value, component) {
     var owner;
     if (component) {
-      owner = component._currentElement._owner;
+      owner = getComponentOwner(component);
     }
     if (name.indexOf('-') > -1) {
       warnHyphenatedStyleName(name, owner);
@@ -128,6 +128,28 @@ if (process.env.NODE_ENV !== 'production') {
 }
 
 var styleWarnings = {};
+
+function getComponentType(component) {
+  if (component._currentElement) {
+    return component._currentElement.type
+  }
+
+  // in case of fiber / react 16
+  return component.type.displayName;
+}
+
+function getComponentName(component) {
+  return component.getName() || component.displayName;
+}
+
+function getComponentOwner(component) {
+  if (component._currentElement) {
+    return component._currentElement._owner;
+  }
+
+  // in case of fiber / react 16
+  return component._debugOwner;
+}
 
 /**
  * Convert a value into the proper css writable value. The style name `name`
@@ -170,8 +192,8 @@ function dangerousStyleValue(name, value, component) {
       // Allow '0' to pass through without warning. 0 is already special and
       // doesn't require units, so we don't need to warn about it.
       if (component && value !== '0') {
-        var owner = component._currentElement._owner;
-        var ownerName = owner ? owner.getName() : null;
+        var owner = getComponentOwner(component);
+        var ownerName = owner ? getComponentName(owner) : null;
         if (ownerName && !styleWarnings[ownerName]) {
           styleWarnings[ownerName] = {};
         }
@@ -190,7 +212,7 @@ function dangerousStyleValue(name, value, component) {
                 'a `%s` tag (owner: `%s`) was passed a numeric string value ' +
                   'for CSS property `%s` (value: `%s`) which will be treated ' +
                   'as a unitless number in a future version of React.',
-                component._currentElement.type,
+                getComponentType(component),
                 ownerName || 'unknown',
                 name,
                 value
