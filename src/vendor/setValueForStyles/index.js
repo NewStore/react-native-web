@@ -134,12 +134,37 @@ function getComponentType(component) {
     return component._currentElement.type
   }
 
-  // in case of fiber / react 16
-  return component.type.displayName;
+  const {type} = component;
+
+  if (typeof type === 'string') {
+    return type;
+  }
+
+  if (typeof type === 'function') {
+    return type.displayName || type.name;
+  }
+
+  return null;
 }
 
 function getComponentName(component) {
-  return component.getName() || component.displayName;
+  if (typeof component.getName === 'function') {
+    return component.getName();
+  }
+
+  if (typeof component.tag === 'number') {
+    const {type} = component;
+
+    if (typeof type === 'string') {
+      return type;
+    }
+
+    if (typeof type === 'function') {
+      return type.displayName || type.name;
+    }
+  }
+
+  return null;
 }
 
 function getComponentOwner(component) {
@@ -147,7 +172,6 @@ function getComponentOwner(component) {
     return component._currentElement._owner;
   }
 
-  // in case of fiber / react 16
   return component._debugOwner;
 }
 
