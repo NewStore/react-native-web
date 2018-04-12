@@ -1,4 +1,5 @@
 import findNodeHandle from './modules/findNodeHandle';
+import processColor from './exports/processColor';
 import { render, unmountComponentAtNode } from 'react-dom';
 
 // APIs
@@ -91,6 +92,7 @@ const ReactNative = {
   // modules
   createDOMElement,
   NativeModules,
+  processColor,
 
   // propTypes
   ColorPropType,

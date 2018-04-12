@@ -1,6 +1,6 @@
 {
   "name": "@newstore/react-native-web",
-  "version": "0.0.72-newstore-sdk.1",
+  "version": "0.0.72-newstore-sdk.2",
   "description": "React Native for Web",
   "main": "dist/index.js",
   "files": [
